@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-08-28T01:02:12Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+        <group>
+            <name>Templates Rivendel</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template EBS - Mandic</template>
+            <name>Template EBS - Mandic</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+                <group>
+                    <name>Templates Rivendel</name>
+                </group>
+            </groups>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Discovery Volumes EBS</name>
+                    <type>EXTERNAL</type>
+                    <key>ebs-discovery.py[{$REGION}]</key>
+                    <delay>60s</delay>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>BurstBalance of {#VOLID}</name>
+                            <type>EXTERNAL</type>
+                            <key>cloudwatch-zabbix.py[&quot;BurstBalance&quot;,&quot;Average&quot;,&quot;VolumeId&quot;,&quot;{#VOLID}&quot;,&quot;AWS/EBS&quot;,&quot;{$REGION}&quot;]</key>
+                            <delay>5m</delay>
+                            <history>30d</history>
+                            <value_type>FLOAT</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>{#VOLID}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{max(3m)}&lt;{$BURST}</expression>
+                                    <name>Volume {#VOLID} burst balance atigiu 30%</name>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <request_method>POST</request_method>
+                </discovery_rule>
+            </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$BURST}</macro>
+                    <value>30</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>
