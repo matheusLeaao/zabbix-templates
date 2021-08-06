@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>3.0</version>
+    <date>2019-07-25T20:47:08Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+        <group>
+            <name>Templates Criados</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template CPU Credit AWS</template>
+            <name>Template CPU Credit AWS</name>
+            <description/>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+                <group>
+                    <name>Templates Criados</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Credit CPU</name>
+                </application>
+            </applications>
+            <items/>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>ECS Instance Discovery</name>
+                    <type>10</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>ec2-discovery.py[us-east-1]</key>
+                    <delay>600</delay>
+                    <status>0</status>
+                    <allowed_hosts/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <filter>
+                        <evaltype>0</evaltype>
+                        <formula/>
+                        <conditions>
+                            <condition>
+                                <macro>{#INSTANCETYPE}</macro>
+                                <value>^t.*</value>
+                                <operator>8</operator>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>0</lifetime>
+                    <description>Chave e valores retornados no discovery&#13;
+      &quot;{#REGION}&quot;: &quot;region&quot;,&#13;
+      &quot;{#INSTANCENAME}&quot;: &quot;NAME&quot;,&#13;
+      &quot;{#INSTANCETYPE}&quot;: &quot;tX.xxxx&quot;,&#13;
+      &quot;{#INSTANCEID}&quot;: &quot;i-xxxxxxxxx&quot;,&#13;
+      &quot;{#PRIVATEIP}&quot;: &quot;x.x.x.x&quot;</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Credit CPU on {#INSTANCENAME}-{#INSTANCEID}-{#INSTANCETYPE}</name>
+                            <type>10</type>
+                            <snmp_community/>
+                            <multiplier>0</multiplier>
+                            <snmp_oid/>
+                            <key>cpu_credit[{#INSTANCEID},{#REGION}]</key>
+                            <delay>300</delay>
+                            <history>8</history>
+                            <trends>0</trends>
+                            <status>0</status>
+                            <value_type>0</value_type>
+                            <allowed_hosts/>
+                            <units/>
+                            <delta>0</delta>
+                            <snmpv3_contextname/>
+                            <snmpv3_securityname/>
+                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                            <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                            <snmpv3_authpassphrase/>
+                            <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                            <snmpv3_privpassphrase/>
+                            <formula>1</formula>
+                            <delay_flex/>
+                            <params/>
+                            <ipmi_sensor/>
+                            <data_type>0</data_type>
+                            <authtype>0</authtype>
+                            <username/>
+                            <password/>
+                            <publickey/>
+                            <privatekey/>
+                            <port/>
+                            <description/>
+                            <inventory_link>0</inventory_link>
+                            <applications>
+                                <application>
+                                    <name>Credit CPU</name>
+                                </application>
+                            </applications>
+                            <valuemap/>
+                            <logtimefmt/>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>{#REGION}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template CPU Credit AWS:cpu_credit[{#INSTANCEID}].last()}&lt;{$CPUCREDIT_DISASTER} and {Template CPU Credit AWS:cpu_credit[{#INSTANCEID}].last()}&gt;=0</expression>
+                            <name>Credito de CPU abaixo de {$CPUCREDIT_DISASTER} em  {#INSTANCENAME} - {#INSTANCEID}</name>
+                            <url/>
+                            <status>0</status>
+                            <priority>5</priority>
+                            <description/>
+                            <type>0</type>
+                            <dependencies>
+                                <dependency>
+                                    <name>Problema de coleta de credito CPU em  {#INSTANCENAME} - {#INSTANCEID}</name>
+                                    <expression>{Template CPU Credit AWS:cpu_credit[{#INSTANCEID}].avg(12m)}=-1</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template CPU Credit AWS:cpu_credit[{#INSTANCEID}].last()}&lt;{$CPUCREDIT_HIGH} and {Template CPU Credit AWS:cpu_credit[{#INSTANCEID}].last()}&gt;=0</expression>
+                            <name>Credito de CPU abaixo de {$CPUCREDIT_HIGH} em  {#INSTANCENAME} - {#INSTANCEID}</name>
+                            <url/>
+                            <status>0</status>
+                            <priority>4</priority>
+                            <description/>
+                            <type>0</type>
+                            <dependencies>
+                                <dependency>
+                                    <name>Credito de CPU abaixo de {$CPUCREDIT_HIGH} em  {#INSTANCENAME} - {#INSTANCEID}</name>
+                                    <expression>{Template CPU Credit AWS:cpu_credit[{#INSTANCEID}].last()}&lt;{$CPUCREDIT_DISASTER} and {Template CPU Credit AWS:cpu_credit[{#INSTANCEID}].last()}&gt;=0</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>Problema de coleta de credito CPU em  {#INSTANCENAME} - {#INSTANCEID}</name>
+                                    <expression>{Template CPU Credit AWS:cpu_credit[{#INSTANCEID}].avg(12m)}=-1</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template CPU Credit AWS:cpu_credit[{#INSTANCEID}].avg(12m)}=-1</expression>
+                            <name>Problema de coleta de credito CPU em  {#INSTANCENAME} - {#INSTANCEID}</name>
+                            <url/>
+                            <status>0</status>
+                            <priority>4</priority>
+                            <description/>
+                            <type>0</type>
+                            <dependencies/>
+                        </trigger_prototype>
+                    </trigger_prototypes>
+                    <graph_prototypes/>
+                    <host_prototypes/>
+                </discovery_rule>
+            </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$CPUCREDIT_DISASTER}</macro>
+                    <value>10</value>
+                </macro>
+                <macro>
+                    <macro>{$CPUCREDIT_HIGH}</macro>
+                    <value>30</value>
+                </macro>
+            </macros>
+            <templates/>
+            <screens/>
+        </template>
+    </templates>
+</zabbix_export>
+

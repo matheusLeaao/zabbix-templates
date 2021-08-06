@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-12-01T18:03:34Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template Host AWS ECS - MANDIC</template>
+            <name>Template Host AWS ECS - MANDIC</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>ECS</name>
+                </application>
+                <application>
+                    <name>Instance Agent</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Active Services Count of Cluster</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs-cluster.py[&quot;{HOST.HOST}&quot;,&quot;activeServicesCount&quot;,&quot;{$REGION}&quot;]</key>
+                    <delay>2m</delay>
+                    <history>8d</history>
+                    <trends>180d</trends>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Pending Tasks Count of Cluster</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs-cluster.py[&quot;{HOST.HOST}&quot;,&quot;pendingTasksCount&quot;,&quot;{$REGION}&quot;]</key>
+                    <delay>2m</delay>
+                    <history>8d</history>
+                    <trends>180d</trends>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{min(5m)}&gt;0</expression>
+                            <name>Tasks pendentes no {HOST.HOST} a mais de 5 minutos</name>
+                            <priority>DISASTER</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Registered Container Instances Count of Cluster</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs-cluster.py[&quot;{HOST.HOST}&quot;,&quot;registeredContainerInstancesCount&quot;,&quot;{$REGION}&quot;]</key>
+                    <delay>2m</delay>
+                    <history>8d</history>
+                    <trends>180d</trends>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Running Tasks Count of Cluster</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs-cluster.py[&quot;{HOST.HOST}&quot;,&quot;runningTasksCount&quot;,&quot;{$REGION}&quot;]</key>
+                    <delay>2m</delay>
+                    <history>8d</history>
+                    <trends>180d</trends>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Status Cluster</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs-cluster.py[&quot;{HOST.HOST}&quot;,&quot;status&quot;,&quot;{$REGION}&quot;]</key>
+                    <history>8d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>(({regexp(ACTIVE)})=0)</expression>
+                            <name>Cluster {HOST.HOST} com Status diferente de &quot;ACTIVE&quot;</name>
+                            <priority>DISASTER</priority>
+                            <type>MULTIPLE</type>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Total Cluster CPU Reservation</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs_stats.py[&quot;--metric&quot;,&quot;CPUReservation&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                    <delay>2m</delay>
+                    <history>8d</history>
+                    <trends>180d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;=90</expression>
+                            <name>Reserva de CPU maior que 90% de utilização em {HOST.HOST}</name>
+                            <priority>DISASTER</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Total Cluster CPU Utilization</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs_stats.py[&quot;--metric&quot;,&quot;CPUUtilization&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                    <delay>2m</delay>
+                    <history>8d</history>
+                    <trends>180d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{min(3m)}&gt;={$ECS_CPUD}</expression>
+                            <name>Utilização de CPU maior que {$ECS_CPUD} em {HOST.HOST}</name>
+                            <priority>DISASTER</priority>
+                        </trigger>
+                        <trigger>
+                            <expression>{min(2m)}&gt;={$ECS_CPUH}</expression>
+                            <name>Utilização de CPU maior que {$ECS_CPUH} em {HOST.HOST}</name>
+                            <priority>HIGH</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>Utilização de CPU maior que {$ECS_CPUD} em {HOST.HOST}</name>
+                                    <expression>{Template Host AWS ECS - MANDIC:ecs_stats.py[&quot;--metric&quot;,&quot;CPUUtilization&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;].min(3m)}&gt;={$ECS_CPUD}</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{min(2m)}&gt;={$ECS_CPUW}</expression>
+                            <name>Utilização de CPU maior que {$ECS_CPUW} em {HOST.HOST}</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>Utilização de CPU maior que {$ECS_CPUH} em {HOST.HOST}</name>
+                                    <expression>{Template Host AWS ECS - MANDIC:ecs_stats.py[&quot;--metric&quot;,&quot;CPUUtilization&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;].min(2m)}&gt;={$ECS_CPUH}</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Total Cluster Memory Reservation</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs_stats.py[&quot;--metric&quot;,&quot;MemoryReservation&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                    <delay>2m</delay>
+                    <history>8d</history>
+                    <trends>180d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;=90</expression>
+                            <name>Reserva de mermória maior que 90% de utilização em {HOST.HOST}</name>
+                            <priority>DISASTER</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Total Cluster Memory Utilization</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs_stats.py[&quot;--metric&quot;,&quot;MemoryUtilization&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                    <delay>2m</delay>
+                    <history>8d</history>
+                    <trends>180d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{min(3m)}&gt;={$ECS_MEMD}</expression>
+                            <name>Utilização de memória maior que {$ECS_MEMD} em {HOST.HOST}</name>
+                            <priority>DISASTER</priority>
+                        </trigger>
+                        <trigger>
+                            <expression>{min(2m)}&gt;={$ECS_MEMH}</expression>
+                            <name>Utilização de memória maior que {$ECS_MEMH} em {HOST.HOST}</name>
+                            <priority>HIGH</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>Utilização de memória maior que {$ECS_MEMD} em {HOST.HOST}</name>
+                                    <expression>{Template Host AWS ECS - MANDIC:ecs_stats.py[&quot;--metric&quot;,&quot;MemoryUtilization&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;].min(3m)}&gt;={$ECS_MEMD}</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{min(2m)}&gt;={$ECS_MEMW}</expression>
+                            <name>Utilização de memória maior que {$ECS_MEMW} em {HOST.HOST}</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>Utilização de memória maior que {$ECS_MEMH} em {HOST.HOST}</name>
+                                    <expression>{Template Host AWS ECS - MANDIC:ecs_stats.py[&quot;--metric&quot;,&quot;MemoryUtilization&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;].min(2m)}&gt;={$ECS_MEMH}</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Task x Service</name>
+                    <type>CALCULATED</type>
+                    <key>tasksofservice</key>
+                    <delay>2m</delay>
+                    <history>8d</history>
+                    <trends>180d</trends>
+                    <value_type>FLOAT</value_type>
+                    <params>last(&quot;ecs-cluster.py[\&quot;{HOST.HOST}\&quot;,\&quot;runningTasksCount\&quot;,\&quot;{$REGION}\&quot;]&quot;) - last(&quot;ecs-cluster.py[\&quot;{HOST.HOST}\&quot;,\&quot;activeServicesCount\&quot;,\&quot;{$REGION}\&quot;]&quot;)</params>
+                    <applications>
+                        <application>
+                            <name>ECS</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;0</expression>
+                            <name>Quantidade de tasks menor que a quantidade de serviços em {HOST.HOST}</name>
+                            <priority>DISASTER</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>ECS Instance Discovery</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs-listinstance.py[&quot;{HOST.HOST}&quot;,&quot;{$REGION}&quot;]</key>
+                    <delay>600s</delay>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Versão do Agent ECS em  {#INSTANCEID}</name>
+                            <type>EXTERNAL</type>
+                            <key>ecs-instance.py[{HOST.HOST},&quot;agentVersion&quot;, &quot;{#INSTANCEID}&quot;,&quot;{$REGION}&quot;]</key>
+                            <delay>600s</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>Instance Agent</name>
+                                </application>
+                            </applications>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{regexp({$AGENTVERSION})}=0</expression>
+                                    <name>Agent na versão {ITEM.LASTVALUE} em {#INSTANCEID} - Versão atual {$AGENTVERSION}</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <request_method>POST</request_method>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>ECS Service Discovery</name>
+                    <type>EXTERNAL</type>
+                    <key>ecs_stats.py[&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;,&quot;--discover&quot;]</key>
+                    <delay>600s</delay>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Service Status for {#SERVICE}</name>
+                            <type>EXTERNAL</type>
+                            <key>ecs-service.py[&quot;{HOST.HOST}&quot;,&quot;{#SERVICE}&quot;,&quot;status&quot;,&quot;{$REGION}&quot;]</key>
+                            <delay>60s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>Instance Agent</name>
+                                </application>
+                            </applications>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Service {#SERVICE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{regexp(ACTIVE)}=0</expression>
+                                    <name>Status do {#SERVICE} diferente de ACTIVE</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>Cluster {HOST.HOST} com Status diferente de &quot;ACTIVE&quot;</name>
+                                            <expression>(({Template Host AWS ECS - MANDIC:ecs-cluster.py[&quot;{HOST.HOST}&quot;,&quot;status&quot;,&quot;{$REGION}&quot;].regexp(ACTIVE)})=0)</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Running Tasks for {#SERVICE}</name>
+                            <type>EXTERNAL</type>
+                            <key>ecs-tasks.py[&quot;{HOST.HOST}&quot;,&quot;{#SERVICE}&quot;,&quot;{$REGION}&quot;]</key>
+                            <delay>60s</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>Instance Agent</name>
+                                </application>
+                            </applications>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Service {#SERVICE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>Nenhuma task em execução para o {#SERVICE}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>Cluster {HOST.HOST} com Status diferente de &quot;ACTIVE&quot;</name>
+                                            <expression>(({Template Host AWS ECS - MANDIC:ecs-cluster.py[&quot;{HOST.HOST}&quot;,&quot;status&quot;,&quot;{$REGION}&quot;].regexp(ACTIVE)})=0)</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Service CPU Utilization for {#SERVICE}</name>
+                            <type>EXTERNAL</type>
+                            <key>ecs_stats.py[&quot;--metric&quot;,&quot;CPUUtilization&quot;,&quot;--service-name&quot;,&quot;{#SERVICE}&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                            <delay>2m</delay>
+                            <value_type>FLOAT</value_type>
+                            <units>%</units>
+                            <applications>
+                                <application>
+                                    <name>Instance Agent</name>
+                                </application>
+                            </applications>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Service {#SERVICE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{min(4m)}&gt;={$ECS_CPUD:&quot;{#SERVICE}&quot;}</expression>
+                                    <name>Consumo de CPU maior que {$ECS_CPUD:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{min(4m)}&gt;={$ECS_CPUH:&quot;{#SERVICE}&quot;}</expression>
+                                    <name>Consumo de CPU maior que {$ECS_CPUH:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>Consumo de CPU maior que {$ECS_CPUD:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                            <expression>{Template Host AWS ECS - MANDIC:ecs_stats.py[&quot;--metric&quot;,&quot;CPUUtilization&quot;,&quot;--service-name&quot;,&quot;{#SERVICE}&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;].min(4m)}&gt;={$ECS_CPUD:&quot;{#SERVICE}&quot;}</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{min(4m)}&gt;={$ECS_CPUW:&quot;{#SERVICE}&quot;}</expression>
+                                    <name>Consumo de CPU maior que {$ECS_CPUW:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>Consumo de CPU maior que {$ECS_CPUH:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                            <expression>{Template Host AWS ECS - MANDIC:ecs_stats.py[&quot;--metric&quot;,&quot;CPUUtilization&quot;,&quot;--service-name&quot;,&quot;{#SERVICE}&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;].min(4m)}&gt;={$ECS_CPUH:&quot;{#SERVICE}&quot;}</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Service Memory Utilization for {#SERVICE}</name>
+                            <type>EXTERNAL</type>
+                            <key>ecs_stats.py[&quot;--metric&quot;,&quot;MemoryUtilization&quot;,&quot;--service-name&quot;,&quot;{#SERVICE}&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                            <delay>2m</delay>
+                            <value_type>FLOAT</value_type>
+                            <units>%</units>
+                            <applications>
+                                <application>
+                                    <name>Instance Agent</name>
+                                </application>
+                            </applications>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Service {#SERVICE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{min(4m)}&gt;={$ECS_MEMD:&quot;{#SERVICE}&quot;}</expression>
+                                    <name>Utilização de memória maior que {$ECS_MEMD:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{min(4m)}&gt;={$ECS_MEMH:&quot;{#SERVICE}&quot;}</expression>
+                                    <name>Utilização de memória maior que {$ECS_MEMH:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>Utilização de memória maior que {$ECS_MEMD:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                            <expression>{Template Host AWS ECS - MANDIC:ecs_stats.py[&quot;--metric&quot;,&quot;MemoryUtilization&quot;,&quot;--service-name&quot;,&quot;{#SERVICE}&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;].min(4m)}&gt;={$ECS_MEMD:&quot;{#SERVICE}&quot;}</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{min(4m)}&gt;={$ECS_MEMW:&quot;{#SERVICE}&quot;}</expression>
+                                    <name>Utilização de memória maior que {$ECS_MEMW:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>Utilização de memória maior que {$ECS_MEMH:&quot;{#SERVICE}&quot;} em {#SERVICE} cluster {HOST.HOST}</name>
+                                            <expression>{Template Host AWS ECS - MANDIC:ecs_stats.py[&quot;--metric&quot;,&quot;MemoryUtilization&quot;,&quot;--service-name&quot;,&quot;{#SERVICE}&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;].min(4m)}&gt;={$ECS_MEMH:&quot;{#SERVICE}&quot;}</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <request_method>POST</request_method>
+                </discovery_rule>
+            </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$AGENTVERSION}</macro>
+                    <value>1.36</value>
+                </macro>
+                <macro>
+                    <macro>{$AWS_ACCESS_KEY}</macro>
+                </macro>
+                <macro>
+                    <macro>{$AWS_SECRET_KEY}</macro>
+                </macro>
+                <macro>
+                    <macro>{$ECS_CPUD}</macro>
+                    <value>85</value>
+                </macro>
+                <macro>
+                    <macro>{$ECS_CPUH}</macro>
+                    <value>80</value>
+                </macro>
+                <macro>
+                    <macro>{$ECS_CPUW}</macro>
+                    <value>70</value>
+                </macro>
+                <macro>
+                    <macro>{$ECS_MEMD}</macro>
+                    <value>85</value>
+                </macro>
+                <macro>
+                    <macro>{$ECS_MEMH}</macro>
+                    <value>80</value>
+                </macro>
+                <macro>
+                    <macro>{$ECS_MEMW}</macro>
+                    <value>70</value>
+                </macro>
+                <macro>
+                    <macro>{$REGION}</macro>
+                    <value>us-west-2</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <graphs>
+        <graph>
+            <name>Cluster CPU Utilization</name>
+            <graph_items>
+                <graph_item>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template Host AWS ECS - MANDIC</host>
+                        <key>ecs_stats.py[&quot;--metric&quot;,&quot;CPUReservation&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Template Host AWS ECS - MANDIC</host>
+                        <key>ecs_stats.py[&quot;--metric&quot;,&quot;CPUUtilization&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Cluster Memory Utilization</name>
+            <graph_items>
+                <graph_item>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template Host AWS ECS - MANDIC</host>
+                        <key>ecs_stats.py[&quot;--metric&quot;,&quot;MemoryReservation&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Template Host AWS ECS - MANDIC</host>
+                        <key>ecs_stats.py[&quot;--metric&quot;,&quot;MemoryUtilization&quot;,&quot;--cluster-name&quot;,&quot;{HOST.HOST}&quot;,&quot;--region&quot;,&quot;{$REGION}&quot;]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
+</zabbix_export>
+

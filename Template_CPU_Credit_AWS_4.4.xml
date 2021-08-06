@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-08-27T22:31:49Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+        <group>
+            <name>Templates Criados</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template CPU Credit AWS</template>
+            <name>Template CPU Credit AWS</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+                <group>
+                    <name>Templates Criados</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Credit CPU</name>
+                </application>
+            </applications>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>ECS Instance Discovery</name>
+                    <type>EXTERNAL</type>
+                    <key>ec2-discovery.py[us-east-1]</key>
+                    <delay>600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#INSTANCETYPE}</macro>
+                                <value>^t.*</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>0</lifetime>
+                    <description>Chave e valores retornados no discovery&#13;
+      &quot;{#REGION}&quot;: &quot;region&quot;,&#13;
+      &quot;{#INSTANCENAME}&quot;: &quot;NAME&quot;,&#13;
+      &quot;{#INSTANCETYPE}&quot;: &quot;tX.xxxx&quot;,&#13;
+      &quot;{#INSTANCEID}&quot;: &quot;i-xxxxxxxxx&quot;,&#13;
+      &quot;{#PRIVATEIP}&quot;: &quot;x.x.x.x&quot;</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Credit CPU on {#INSTANCENAME}-{#INSTANCEID}-{#INSTANCETYPE}</name>
+                            <type>EXTERNAL</type>
+                            <key>cpu-credits.py[{#INSTANCEID},{#REGION}]</key>
+                            <delay>300</delay>
+                            <history>8d</history>
+                            <trends>0</trends>
+                            <value_type>FLOAT</value_type>
+                            <applications>
+                                <application>
+                                    <name>Credit CPU</name>
+                                </application>
+                            </applications>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>{#REGION}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;40 and {last()}&gt;=0</expression>
+                                    <name>{ITEM.LASTVALUE} of Credit CPU on {#INSTANCENAME}-{#INSTANCEID} {#INSTANCETYPE}</name>
+                                    <url>https://console.aws.amazon.com/ec2/v2/home?region={#REGION}#Instances:instanceId={#INSTANCEID}</url>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$CPUCREDIT_DISASTER}</macro>
+                    <value>10</value>
+                </macro>
+                <macro>
+                    <macro>{$CPUCREDIT_HIGH}</macro>
+                    <value>30</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>
+
